@@ -1,0 +1,373 @@
+/**
+ * lexical Analyzer and parser generating script for language CMinus
+ *
+ */
+
+options {
+  JAVA_UNICODE_ESCAPE = true;
+  DEBUG_PARSER=true; //print trace of parsing tree
+}
+
+PARSER_BEGIN(CMParser)
+
+public class CMParser {
+
+  public static void main(String args[]) {
+    CMParser parser;
+    if (args.length == 0) {
+      System.out.println("CM Parser:  Reading from standard input . . .");
+      parser = new CMParser(System.in);
+    } else if (args.length == 1) {
+      System.out.println("CM Parser:  Reading from file " + args[0] + " . . .");
+      try {
+        parser = new CMParser(new java.io.FileInputStream(args[0]));
+      } catch (java.io.FileNotFoundException e) {
+        System.out.println("CM Parser :  File " + args[0] + " not found.");
+        return;
+      }
+    } else {
+      System.out.println("CM Parser 1.0.2:  Usage is one of:");
+      System.out.println("         java CMParser< inputfile");
+      System.out.println("OR");
+      System.out.println("         java CMParser inputfile");
+      return;
+    }
+    try {
+      parser.program();
+      System.out.println("CM Parser :  CMinus program parsed successfully.");
+    } catch (ParseException e) {
+      System.out.println("CM Parser :  Encountered errors during parse.");
+      System.out.println(e);
+
+    }
+  }
+
+}
+
+PARSER_END(CMParser)
+
+
+SKIP : /* WHITE SPACE */
+{
+" "
+|"\t"
+| "\n"
+| "\r"
+| "\f"
+}
+
+SPECIAL_TOKEN : /* COMMENTS */
+{
+<COMMENT: "/*" (~["*"])* "*" ("*" | (~["*","/"] (~["*"])* "*"))* "/">
+}
+
+
+TOKEN : /* RESERVED WORDS AND LITERALS */
+{
+  < ELSE: "else" >
+| < IF: "if" >
+| < INT: "int" >
+| < RETURN: "return" >
+| < VOID: "void" >
+| < WHILE: "while" >
+}
+
+TOKEN : /* LITERALS */
+{
+< NUMBER: ["0"-"9"] (["0"-"9"])* >
+|< EMPTY : "" >  
+}
+
+TOKEN : /* IDENTIFIERS */
+{
+  < ID: <LETTER> (<LETTER>)* >
+|
+  < #LETTER:
+      [
+       "\u0024",
+       "\u0041"-"\u005a",
+       "\u005f",
+       "\u0061"-"\u007a",
+       "\u00c0"-"\u00d6",
+       "\u00d8"-"\u00f6",
+       "\u00f8"-"\u00ff",
+       "\u0100"-"\u1fff",
+       "\u3040"-"\u318f",
+       "\u3300"-"\u337f",
+       "\u3400"-"\u3d2d",
+       "\u4e00"-"\u9fff",
+       "\uf900"-"\ufaff"
+      ]
+  >
+|
+  < #DIGIT:
+      [
+       "\u0030"-"\u0039",
+       "\u0660"-"\u0669",
+       "\u06f0"-"\u06f9",
+       "\u0966"-"\u096f",
+       "\u09e6"-"\u09ef",
+       "\u0a66"-"\u0a6f",
+       "\u0ae6"-"\u0aef",
+       "\u0b66"-"\u0b6f",
+       "\u0be7"-"\u0bef",
+       "\u0c66"-"\u0c6f",
+       "\u0ce6"-"\u0cef",
+       "\u0d66"-"\u0d6f",
+       "\u0e50"-"\u0e59",
+       "\u0ed0"-"\u0ed9",
+       "\u1040"-"\u1049"
+      ]
+  >
+}
+
+TOKEN : /* SEPARATORS */
+{
+  < LPAREN: "(" >
+| < RPAREN: ")" >
+| < LBRACE: "{" >
+| < RBRACE: "}" >
+| < LBRACKET: "[" >
+| < RBRACKET: "]" >
+| < SEMICOLON: ";" >
+| < COMMA: "," >
+| < DOT: "." >
+}
+
+TOKEN : /* OPERATORS */
+{
+  < ASSIGN: "=" >
+| < GT: ">" >
+| < LT: "<" >
+| < EQ: "==" >
+| < LE: "<=" >
+| < GE: ">=" >
+| < NE: "!=" >
+| < PLUS: "+" >
+| < MINUS: "-" >
+| < STAR: "*" >
+| < SLASH: "/" >
+}
+
+
+/*****************************************
+ * THE CM LANGUAGE GRAMMAR STARTS HERE *
+ *****************************************/
+
+/*
+ * Program structuring syntax follows.
+ */
+
+//1. program -> declaration-list
+void program():
+{}
+{
+  declarationlist()
+}
+
+//2. declaration-list -> declaration-list declaration | declaration
+void declarationlist():
+{}
+{
+  declaration() (declaration())* //simplified rule to escape left recursion  
+}
+
+//3. declaration -> var-declaration | fun-declaration
+void declaration():
+{}
+{
+  LOOKAHEAD(3) // look next tokens to clarify
+  vardeclaration() | fundeclaration()
+}
+
+//4. var-declaration-> type-specifier <ID> ; | type-specifier <ID> [ <NUMBER> ] ;
+void vardeclaration():
+{}
+{
+  LOOKAHEAD(3)
+  typespecifier() <ID > ";" |typespecifier() <ID> "["<NUMBER>"]" ";"
+}
+
+//5. type-specifier-> int | void
+void typespecifier():
+{}
+{
+  "int"  |"void"
+}
+
+//6. fun-declaration-> type-specifier ID ( params ) compound-stmt
+void fundeclaration():
+{}
+{  
+  typespecifier()  <ID> "(" params() ")"  compoundstmt()
+}
+
+//7. params-> param-list | VOID
+void params():
+{}
+{
+  <VOID>|paramlist()
+}
+
+//8. param-list-> param-list , param| param
+void paramlist():
+{}
+{
+  param()(","param() )* //simplified the rule to escape left recursion
+}
+
+//9. param-> type-specifier ID | type-specifier ID [ ]
+void param():
+{}
+{
+  LOOKAHEAD(3)
+  typespecifier() <ID> "[""]" | typespecifier() <ID>
+  
+}
+
+//10. compound-stmt-> { local-declarations statement-list }
+void compoundstmt():
+{}
+{
+  "{" (localdeclarations() | statementlist())* "}" //more generalize method body
+}
+
+//11. local-declarations-> local-declarations var-declaration | empty
+void localdeclarations():
+{}
+{
+   vardeclaration()(vardeclaration())* //simplified the rule to escape left recursion
+}
+
+//12. statement-list-> statement-list statement | empty
+void statementlist():
+{}
+{
+  statement()(statement())* //simplified the rule to escape left recursion
+}
+
+//13. statement-> expression-stmt | compound-stmt | selection-stmt | iteration-stmt | return-stmt
+void statement():
+{}
+{
+  expressionstmt() | compoundstmt() | selectionstmt() | iterationstmt() | returnstmt()
+}
+
+//14. expression-stmt-> expression ; | ;
+void expressionstmt():
+{}
+{
+   expression() ";" | ";"
+}
+
+//15. selection-stmt-> if( expression ) statement | if( expression ) statement else
+void selectionstmt():
+{}
+{
+  "if""("expression() ") "statement() | "if(" expression() ") "statement() "else" statement()
+}
+
+//16. iteration-stmt-> while ( expression ) statement
+void iterationstmt():
+{}
+{
+  "while" "(" expression() ")" statement()
+}
+
+//17. return-stmt-> return ; | return expression ;
+void returnstmt():
+{}
+{
+  "return" (expression())* ";" //simplified
+}
+
+//18. expression-> var = expression | simple-expression
+void expression():
+{}
+{
+  LOOKAHEAD(5)
+  var() "=" simpleexpression() | simpleexpression() //simplified the rule to escape left recursion
+}
+
+//19. var-> ID | ID [ expression ]
+void var():
+{}
+{
+  LOOKAHEAD(2)
+  <ID> "[" expression() "]" | <ID>
+  
+
+}
+
+//20. simple-expression -> additive-expression relop additive-expression|additive-expression
+void simpleexpression():
+{}
+{  
+  additiveexpression() (relop()additiveexpression())* //simplified
+}
+
+//21. relop-> < | <= | > | >= | == | !=
+void relop():
+{}
+{
+  "<"| "<=" | ">" | ">=" | "=="| "!="
+}
+
+//22. additive-expression-> additive-expression addop term | term
+void additiveexpression():
+{}
+{
+  term()(addop()term())* //simplified the rule to escape left recursion
+}
+
+//23. addop-> + | -
+void addop():
+{}
+{
+  "+" | "-"
+}
+
+//24. term-> term mulop factor | factor
+void term():
+{}
+{
+  factor() (mulop()factor())* //simplified the rule to escape left recursion
+}
+
+//25. mulop-> * | /
+void mulop():
+{}
+{
+  "*" |"/"
+}
+
+//26. factor-> ( expression ) | var | call | NUM
+void factor():
+{}
+{  
+ "("expression() ")" |(  <NUMBER> |(
+  LOOKAHEAD(2)
+  call() |  var() )) 
+}
+
+//27. call-> ID ( args )
+void call():
+{}
+{
+  <ID> "(" args() ")"  
+}
+
+//28. args-> arg-list | empty
+void args():
+{}
+{
+  (arglist())* //simplified
+}
+
+//29. arg-list-> arg-list , expression | expression
+void arglist():
+{}
+{
+  expression() ("," expression())* //simplified the rule to escape left recursion
+}
+

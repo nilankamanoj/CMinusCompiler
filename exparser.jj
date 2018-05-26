@@ -264,7 +264,8 @@ void expressionstmt():
 void selectionstmt():
 {}
 {
-  <IF><LPAREN>expression() <RPAREN> statement() | <IF><LPAREN> expression() <RPAREN> statement() <ELSE> statement()
+
+  "if""("expression() ") "statement() | "if(" expression() ") "statement() "else" statement()
 }
 
 //16. iteration-stmt-> while ( expression ) statement

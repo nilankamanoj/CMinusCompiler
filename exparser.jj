@@ -185,21 +185,21 @@ void vardeclaration():
 {}
 {
   LOOKAHEAD(3)
-  typespecifier() <ID > ";" |typespecifier() <ID> "["<NUMBER>"]" ";"
+  typespecifier() <ID > <SEMICOLON> |typespecifier() <ID> <LBRACKET><NUMBER><RBRACKET> <SEMICOLON>
 }
 
 //5. type-specifier-> int | void
 void typespecifier():
 {}
 {
-  "int"  |"void"
+  <INT>  |<VOID>
 }
 
 //6. fun-declaration-> type-specifier ID ( params ) compound-stmt
 void fundeclaration():
 {}
 {  
-  typespecifier()  <ID> "(" params() ")"  compoundstmt()
+  typespecifier()  <ID> <LPAREN> params() <RPAREN>  compoundstmt()
 }
 
 //7. params-> param-list | VOID
@@ -213,7 +213,7 @@ void params():
 void paramlist():
 {}
 {
-  param()(","param() )* //simplified the rule to escape left recursion
+  param()(<COMMA>param() )* //simplified the rule to escape left recursion
 }
 
 //9. param-> type-specifier ID | type-specifier ID [ ]
@@ -221,7 +221,7 @@ void param():
 {}
 {
   LOOKAHEAD(3)
-  typespecifier() <ID> "[""]" | typespecifier() <ID>
+  typespecifier() <ID> <LBRACKET><RBRACKET> | typespecifier() <ID>
   
 }
 
@@ -229,7 +229,7 @@ void param():
 void compoundstmt():
 {}
 {
-  "{" (localdeclarations() | statementlist())* "}" //more generalize method body
+  <LBRACE> (localdeclarations() | statementlist())* <RBRACE> //more generalize method body
 }
 
 //11. local-declarations-> local-declarations var-declaration | empty
@@ -257,28 +257,28 @@ void statement():
 void expressionstmt():
 {}
 {
-   expression() ";" | ";"
+   expression() <SEMICOLON> | <SEMICOLON>
 }
 
 //15. selection-stmt-> if( expression ) statement | if( expression ) statement else
 void selectionstmt():
 {}
 {
-  "if""("expression() ") "statement() | "if(" expression() ") "statement() "else" statement()
+  <IF><LPAREN>expression() <RPAREN> statement() | <IF><LPAREN> expression() <RPAREN> statement() <ELSE> statement()
 }
 
 //16. iteration-stmt-> while ( expression ) statement
 void iterationstmt():
 {}
 {
-  "while" "(" expression() ")" statement()
+  <WHILE> <LPAREN> expression() <RPAREN> statement()
 }
 
 //17. return-stmt-> return ; | return expression ;
 void returnstmt():
 {}
 {
-  "return" (expression())* ";" //simplified
+  <RETURN> (expression())* <SEMICOLON> //simplified
 }
 
 //18. expression-> var = expression | simple-expression
@@ -286,7 +286,7 @@ void expression():
 {}
 {
   LOOKAHEAD(5)
-  var() "=" simpleexpression() | simpleexpression() //simplified the rule to escape left recursion
+  var() <ASSIGN> simpleexpression() | simpleexpression() //simplified the rule to escape left recursion
 }
 
 //19. var-> ID | ID [ expression ]
@@ -294,7 +294,7 @@ void var():
 {}
 {
   LOOKAHEAD(2)
-  <ID> "[" expression() "]" | <ID>
+  <ID> <LBRACKET> expression() <RBRACKET> | <ID>
   
 
 }
@@ -310,7 +310,7 @@ void simpleexpression():
 void relop():
 {}
 {
-  "<"| "<=" | ">" | ">=" | "=="| "!="
+  <LT>| <LE> | <GT> | <GE> | <EQ>| <NE>
 }
 
 //22. additive-expression-> additive-expression addop term | term
@@ -324,7 +324,7 @@ void additiveexpression():
 void addop():
 {}
 {
-  "+" | "-"
+  <PLUS> | <MINUS>
 }
 
 //24. term-> term mulop factor | factor
@@ -338,14 +338,14 @@ void term():
 void mulop():
 {}
 {
-  "*" |"/"
+  <STAR> |<SLASH>
 }
 
 //26. factor-> ( expression ) | var | call | NUM
 void factor():
 {}
 {  
- "("expression() ")" |(  <NUMBER> |(
+ <LPAREN>expression() <RPAREN> |(  <NUMBER> |(
   LOOKAHEAD(2)
   call() |  var() )) 
 }
@@ -354,7 +354,7 @@ void factor():
 void call():
 {}
 {
-  <ID> "(" args() ")"  
+  <ID> <LPAREN> args() <RPAREN>  
 }
 
 //28. args-> arg-list | empty
@@ -368,6 +368,6 @@ void args():
 void arglist():
 {}
 {
-  expression() ("," expression())* //simplified the rule to escape left recursion
+  expression() (<COMMA> expression())* //simplified the rule to escape left recursion
 }
 

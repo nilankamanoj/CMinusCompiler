@@ -259,8 +259,7 @@ public class CMParser implements CMParserConstants {
         case ID:
         case LPAREN:
         case LBRACE:
-        case SEMICOLON:
-        case 39:{
+        case SEMICOLON:{
           ;
           break;
           }
@@ -281,8 +280,7 @@ public class CMParser implements CMParserConstants {
         case ID:
         case LPAREN:
         case LBRACE:
-        case SEMICOLON:
-        case 39:{
+        case SEMICOLON:{
           statementlist();
           break;
           }
@@ -337,8 +335,7 @@ public class CMParser implements CMParserConstants {
         case ID:
         case LPAREN:
         case LBRACE:
-        case SEMICOLON:
-        case 39:{
+        case SEMICOLON:{
           ;
           break;
           }
@@ -369,8 +366,7 @@ public class CMParser implements CMParserConstants {
         compoundstmt();
         break;
         }
-      case IF:
-      case 39:{
+      case IF:{
         selectionstmt();
         break;
         }
@@ -427,14 +423,14 @@ public class CMParser implements CMParserConstants {
         jj_consume_token(IF);
         jj_consume_token(LPAREN);
         expression();
-        jj_consume_token(38);
+        jj_consume_token(RPAREN);
         statement();
         break;
-        }
-      case 39:{
-        jj_consume_token(39);
+        }{
+        jj_consume_token(IF);
+        jj_consume_token(LPAREN);
         expression();
-        jj_consume_token(38);
+        jj_consume_token(RPAREN);
         statement();
         jj_consume_token(ELSE);
         statement();
@@ -868,26 +864,15 @@ public class CMParser implements CMParserConstants {
     finally { jj_save(5, xla); }
   }
 
-  static private boolean jj_3R_35()
- {
-    if (jj_3R_20()) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_29()
- {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_scan_token(13)) {
-    jj_scanpos = xsp;
-    if (jj_3R_31()) return true;
-    }
-    return false;
-  }
-
   static private boolean jj_3R_24()
  {
     if (jj_3R_15()) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_35()
+ {
+    if (jj_3R_20()) return true;
     return false;
   }
 
@@ -925,6 +910,14 @@ public class CMParser implements CMParserConstants {
   }
 
   static private boolean jj_3_3()
+ {
+    if (jj_3R_13()) return true;
+    if (jj_scan_token(ID)) return true;
+    if (jj_scan_token(LBRACKET)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_17()
  {
     if (jj_3R_13()) return true;
     if (jj_scan_token(ID)) return true;
@@ -970,14 +963,6 @@ public class CMParser implements CMParserConstants {
     return false;
   }
 
-  static private boolean jj_3R_17()
- {
-    if (jj_3R_13()) return true;
-    if (jj_scan_token(ID)) return true;
-    if (jj_scan_token(LBRACKET)) return true;
-    return false;
-  }
-
   static private boolean jj_3R_15()
  {
     if (jj_3R_18()) return true;
@@ -1010,6 +995,17 @@ public class CMParser implements CMParserConstants {
     if (jj_3R_28()) {
     jj_scanpos = xsp;
     if (jj_3R_29()) return true;
+    }
+    return false;
+  }
+
+  static private boolean jj_3R_31()
+ {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_6()) {
+    jj_scanpos = xsp;
+    if (jj_3R_32()) return true;
     }
     return false;
   }
@@ -1082,17 +1078,6 @@ public class CMParser implements CMParserConstants {
     return false;
   }
 
-  static private boolean jj_3R_31()
- {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_6()) {
-    jj_scanpos = xsp;
-    if (jj_3R_32()) return true;
-    }
-    return false;
-  }
-
   static private boolean jj_3R_21()
  {
     if (jj_3R_25()) return true;
@@ -1100,6 +1085,17 @@ public class CMParser implements CMParserConstants {
     while (true) {
       xsp = jj_scanpos;
       if (jj_3R_26()) { jj_scanpos = xsp; break; }
+    }
+    return false;
+  }
+
+  static private boolean jj_3R_29()
+ {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_scan_token(13)) {
+    jj_scanpos = xsp;
+    if (jj_3R_31()) return true;
     }
     return false;
   }
@@ -1171,7 +1167,7 @@ public class CMParser implements CMParserConstants {
       jj_la1_0 = new int[] {0xa00,0xa00,0xa00,0xa00,0xa00,0x2000000,0xa00,0x114bf00,0x114bf00,0xa00,0x114b500,0x114b500,0x104a000,0x100,0x4a000,0x4a000,0x8000,0xf0000000,0xf0000000,0x0,0x0,0x0,0x0,0x8000,0xa000,0x4a000,0x4a000,0x2000000,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x80,0x80,0x0,0x80,0x80,0x0,0x80,0x0,0x0,0x0,0x3,0x3,0xc,0xc,0x30,0x30,0x0,0x0,0x0,0x0,0x0,};
+      jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x3,0x3,0xc,0xc,0x30,0x30,0x0,0x0,0x0,0x0,0x0,};
    }
   static final private JJCalls[] jj_2_rtns = new JJCalls[6];
   static private boolean jj_rescan = false;
@@ -1381,7 +1377,7 @@ public class CMParser implements CMParserConstants {
   /** Generate ParseException. */
   static public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[40];
+    boolean[] la1tokens = new boolean[38];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
@@ -1398,7 +1394,7 @@ public class CMParser implements CMParserConstants {
         }
       }
     }
-    for (int i = 0; i < 40; i++) {
+    for (int i = 0; i < 38; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;

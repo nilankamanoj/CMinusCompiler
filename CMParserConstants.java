@@ -116,8 +116,6 @@ public interface CMParserConstants {
     "\"-\"",
     "\"*\"",
     "\"/\"",
-    "\") \"",
-    "\"if(\"",
   };
 
 }

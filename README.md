@@ -1,5 +1,8 @@
 # CMinusCompiler
 lexical analyzer and the parser for the c- language
+
+[![N|Solid](https://javacc.org/new-javacc-logo.png)](https://javacc.org/)
+
 # Installation instructions
 1. download javcc from https://javacc.org/download
 2. extract archive to the location c:\

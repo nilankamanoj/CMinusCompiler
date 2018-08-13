@@ -21,7 +21,7 @@ javac *.java
 java CMParser input.txt 
 ```
 # Example program of c- language
-```sh
+```js
 /* A program to perform Euclid's
 Algorithm to compute gcd.*/
 int i;
